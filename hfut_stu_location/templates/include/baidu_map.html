@@ -1,0 +1,139 @@
+<script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=rzRXo9Tp7QiQOkejP4GYuzkL"></script>
+<!-- 加载百度地图样式信息窗口 -->
+<script src="http://api.map.baidu.com/library/SearchInfoWindow/1.5/src/SearchInfoWindow_min.js"></script>
+<link rel="stylesheet" href="http://api.map.baidu.com/library/SearchInfoWindow/1.5/src/SearchInfoWindow_min.css"/>
+<!-- 加载自定义信息窗口插件 -->
+<script src="http://api.map.baidu.com/library/InfoBox/1.2/src/InfoBox_min.js"></script>
+
+<script>
+    //初始化地图大小
+    maap_tag = $('#map');
+    nav_tag = $('nav');
+    maap_tag.css('margin-top', nav_tag.height());
+    maap_tag.width(window.innerWidth);
+    maap_tag.height(window.innerHeight - nav_tag.height());
+    //根据窗口改变地图大小
+    window.onresize = function () {
+        maap_tag.width(window.innerWidth);
+        maap_tag.height(window.innerHeight - nav_tag.height());
+    };
+
+    //初始化地图实例
+    var map = new BMap.Map('map');
+    // 创建地址解析器实例，若用户登录则将焦点定位到自己的地址，否则定位到学校
+    var myGeo = new BMap.Geocoder();
+    // 将地址解析结果显示在地图上,并调整地图视野
+    function centerMap(point) {
+        if (point) {
+            map.centerAndZoom(point, 16);
+            console.log('lng:' + point.lng + ',lat:' + point.lat);
+            {#map.addOverlay(new BMap.Marker(point));#}
+        } else {
+            alert('您选择地址没有解析到结果!');
+        }
+    }
+    {% if user.is_authenticated %}
+        myGeo.getPoint('{{ user.user_info.address }}', centerMap);
+    {% else %}
+        myGeo.getPoint('合肥工业大学（宣城校区）', centerMap);
+    {% endif %}
+
+    //启用滚轮缩放
+    map.enableScrollWheelZoom();
+    //开启键盘移动
+    map.enableKeyboard();
+    //开启连续缩放效果
+    map.enableContinuousZoom();
+    //开启惯性拖拽效果
+    map.enableInertialDragging();
+    //移除版权控件，因为太丑了
+    map.removeControl(new BMap.CopyrightControl());
+    //地图平移缩放控件，PC端默认位于地图左上方，它包含控制地图的平移和缩放的功能。移动端提供缩放控件，默认位于地图右下方。
+    map.addControl(new BMap.NavigationControl({'anchor': BMAP_ANCHOR_TOP_LEFT}));
+    //比例尺控件，默认位于地图左下方，显示地图的比例关系。
+    map.addControl(new BMap.ScaleControl());
+    //缩略地图控件，默认位于地图右下方，是一个可折叠的缩略地图。
+    map.addControl(new BMap.OverviewMapControl());
+    //地图类型控件，默认位于地图右上方。
+    map.addControl(new BMap.MapTypeControl());
+
+    //检索工具
+    //var searchControl = new BMapLib.SearchControl({
+    //    //存放控件的容器
+    //    container: 'search-field',
+    //    //关联地图对象
+    //    map: map,
+    //    //检索类型
+    //    type: BMapLib.SearchControl.LOCAL_SEARCH
+    //});
+    //searchControl.open();
+
+    //添加数据图层
+    var customLayer;
+    if (customLayer) {
+        map.removeTileLayer(customLayer);
+    }
+    customLayer = new BMap.CustomLayer({
+        geotableId: 117158,
+        q: '', //检索关键字
+        tags: '', //空格分隔的多字符串
+        filter: '' //过滤条件,参考http://developer.baidu.com/map/lbs-geosearch.htm#.search.nearby
+    });
+    map.addTileLayer(customLayer);
+    customLayer.addEventListener('hotspotclick', hotspotClick);
+    //添加热点图层单击事件
+    function hotspotClick(e)//单击热点图层
+    {
+        var basePoi = e.customPoi;//poi的默认字段
+        var customPoi = e.content;//poi的自定义字段
+        //todo:信息窗口文字过长会撑破 div
+        //自定义信息窗口样式
+        var htmlHeadStr = [
+            '<div class="panel panel-info infoBoxContent" style="width:300px"><div class="panel-heading"><h3 class="panel-title">',
+            customPoi.name,
+            '<button id="infoBoxCloseButton" class="close pull-right" data-dismiss="panel" aria-label="Close"><span aria-hidden="true">&times;</span></button></h3></div><div class="panel-body"><p>'].join('');
+        var htmlContent = [
+            '性别：', customPoi.sex, '<br/>',
+            '学院：', customPoi.college, '<br/>',
+            '班级：', customPoi.klass, '<br/>',
+            '地址：', basePoi.address, '<br/>'
+        ];
+        var htmlTailStr = '</p></div><div class="panel-footer"></div></div>';
+        {#            <div class="mdl-card__actions mdl-card--border"><button class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">登陆</button></div>#}
+        $.getJSON('/api/get_detail_info', {stu_id: customPoi.stu_id}, function (data) {
+            for (var k in data) {
+                console.log(k, data[k]);
+                var infoCell = [k, '：', data[k], '<br/>'];
+                htmlContent = htmlContent.concat(infoCell);
+            }
+            var html = [htmlHeadStr, htmlContent.join(''), htmlTailStr].join('');
+            var infoBox = new BMapLib.InfoBox(map, html, {
+                {#                boxStyle: {#}
+                {#                    background: 'url('tipbox.gif') no-repeat center top'#}
+                {#                    , width: '270px'#}
+                {#                    , height: '300px'#}
+                {#                }#}
+                enableAutoPan: true
+                , align: INFOBOX_AT_TOP
+                , offset: new BMap.Size(25, 25)
+            });
+            //信息窗打开时的事件绑定
+            infoBox.addEventListener('open', function () {
+                //删除这个二逼的插件产生的 img 标签
+                img = $('.infoBox').find('img')[0];
+                if (img) {
+                    img.remove();
+                }
+                //将关闭功能绑定到 #infoBoxCloseIcon 上
+                function closeInfoBox() {
+                    infoBox.close();
+                }
+
+                $('#infoBoxCloseButton').click(closeInfoBox);
+                map.addEventListener('click', closeInfoBox);
+            });
+            var point = new BMap.Point(basePoi.point.lng, basePoi.point.lat);
+            infoBox.open(point);
+        });
+    }
+</script>
