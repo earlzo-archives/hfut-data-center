@@ -1,0 +1,6 @@
+/*******************************
+     User Global Variables
+*******************************/
+
+@fontName          : 'Microsoft YaHei UI';
+@importGoogleFonts : false;

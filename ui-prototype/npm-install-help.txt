@@ -1,0 +1,14 @@
+
+npm install (with no args, in package dir)
+npm install [<@scope>/]<pkg>
+npm install [<@scope>/]<pkg>@<tag>
+npm install [<@scope>/]<pkg>@<version>
+npm install [<@scope>/]<pkg>@<version range>
+npm install <folder>
+npm install <tarball file>
+npm install <tarball url>
+npm install <git:// url>
+npm install <github username>/<github project>
+
+alias: npm i
+common options: [--save|--save-dev|--save-optional] [--save-exact]

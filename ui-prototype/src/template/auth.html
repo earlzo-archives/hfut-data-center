@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{% block head_title %}{% endblock %}</title>
+    <!--
+    {% block extra_head %}
+    {% endblock %}
+    -->
+    <link rel="stylesheet" href="http://libs.cdnjs.net/semantic-ui/2.1.7/semantic.css">
+</head>
+<body>
+<div class="ui center form warning">
+    <div class="required field">
+        <label>用户名</label>
+        <input type="text" placeholder="joe@schmoe.com">
+    </div>
+    <div class="required field">
+        <label>密码</label>
+        <input type="password" placeholder="123456">
+    </div>
+    <div class="ui warning message">
+        <div class="header">请选择一项！</div>
+        <ul class="list">
+            <li>That e-mail has been subscribed, but you have not yet clicked the verification link in your e-mail.</li>
+        </ul>
+    </div>
+    <div class="ui submit button">Submit</div>
+</div>
+
+<!--
+{% block body %}
+
+    {% if messages %}
+        <div class="ui error message">
+            <div class="header">Messages:</div>
+            <ul class="list">
+                {% for message in messages %}
+                    <li>{{ message }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+
+    <div>
+        <strong>Menu:</strong>
+        <ul>
+            {% if user.is_authenticated %}
+                <li><a href="{% url 'account_email' %}">Change E-mail</a></li>
+                <li><a href="{% url 'account_logout' %}">Sign Out</a></li>
+            {% else %}
+                <li><a href="{% url 'account_login' %}">Sign In</a></li>
+                <li><a href="{% url 'account_signup' %}">Sign Up</a></li>
+            {% endif %}
+        </ul>
+    </div>
+    {% block content %}
+    {% endblock %}
+{% endblock %}
+{% block extra_body %}
+{% endblock %}
+-->
+<div id="particles-js" style="background-color: #b61924"></div>
+</body>
+<script src="http://libs.cdnjs.net/jquery/2.2.0/jquery.js"></script>
+<script src="http://libs.cdnjs.net/semantic-ui/2.1.7/semantic.js"></script>
+<script src="http://libs.cdnjs.net/particles.js/2.0.0/particles.min.js"></script>
+<script>
+    opts = {
+        "particles": {
+            "number": {
+                "value": 80,
+                "density": {
+                    "enable": true,
+                    "value_area": 800
+                }
+            },
+            "color": {
+                "value": "#ffffff"
+            },
+            "shape": {
+                "type": "circle",
+                "stroke": {
+                    "width": 0,
+                    "color": "#000000"
+                },
+                "polygon": {
+                    "nb_sides": 5
+                },
+                "image": {
+                    "src": "img/github.svg",
+                    "width": 100,
+                    "height": 100
+                }
+            },
+            "opacity": {
+                "value": 0.5,
+                "random": false,
+                "anim": {
+                    "enable": false,
+                    "speed": 1,
+                    "opacity_min": 0.1,
+                    "sync": false
+                }
+            },
+            "size": {
+                "value": 10,
+                "random": true,
+                "anim": {
+                    "enable": false,
+                    "speed": 80,
+                    "size_min": 0.1,
+                    "sync": false
+                }
+            },
+            "line_linked": {
+                "enable": true,
+                "distance": 300,
+                "color": "#ffffff",
+                "opacity": 0.4,
+                "width": 2
+            },
+            "move": {
+                "enable": true,
+                "speed": 12,
+                "direction": "none",
+                "random": false,
+                "straight": false,
+                "out_mode": "out",
+                "bounce": false,
+                "attract": {
+                    "enable": false,
+                    "rotateX": 600,
+                    "rotateY": 1200
+                }
+            }
+        },
+        "interactivity": {
+            "detect_on": "canvas",
+            "events": {
+                "onhover": {
+                    "enable": false,
+                    "mode": "repulse"
+                },
+                "onclick": {
+                    "enable": true,
+                    "mode": "push"
+                },
+                "resize": true
+            },
+            "modes": {
+                "grab": {
+                    "distance": 800,
+                    "line_linked": {
+                        "opacity": 1
+                    }
+                },
+                "bubble": {
+                    "distance": 800,
+                    "size": 80,
+                    "duration": 2,
+                    "opacity": 0.8,
+                    "speed": 3
+                },
+                "repulse": {
+                    "distance": 400,
+                    "duration": 0.4
+                },
+                "push": {
+                    "particles_nb": 4
+                },
+                "remove": {
+                    "particles_nb": 2
+                }
+            }
+        },
+        "retina_detect": true
+    };
+    particlesJS('particles-js', opts, function () {
+        console.log('callback - particles.js config loaded');
+    });
+</script>
+</html>
