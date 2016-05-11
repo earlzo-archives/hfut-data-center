@@ -1,3 +1,5 @@
-django
-
-hfut_stu_lib
+django>=1.9
+hfut_stu_lib>=1.2.1
+djangorestframework>=3.0.5
+django-allauth
+django-guardian
